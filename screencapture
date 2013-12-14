@@ -1,0 +1,122 @@
+#!/bin/bash
+
+[ -z FFX_MONO ] && FFX_MONO="1"                # mono
+[ -z FFX_DUAL ] && FFX_DUAL="2"                # dual channel
+[ -z FFX_HW ] && FFX_HW="hw:1,0"               # alsa; run 'cat /proc/asound/pcm' to change to the correct numbers
+[ -z FFX_PULSE ] && FFX_PULSE="pulse"          # pulseaudio; might have to install pavucontrol to change volume
+[ -z FFX_FPS ] && FFX_FPS="30"                 # frame per seconds
+[ -z FFX_WIN_FULL ] && FFX_WIN_FULL=$(xrandr | grep '*'|awk {'print $1'})        # record fullscreen
+[ -z FFX_AUDIO ] && FFX_AUDIO="pcm_s16le"      # audio codec
+[ -z FFX_VIDEO ] && FFX_VIDEO="libx264"        # video codec
+[ -z FFX_PRESET ] && FFX_PRESET="ultrafast"    # preset error? run 'x264 -h' replace with fast,superfast, slow ..etc
+[ -z FFX_CRF ] && FFX_CRF="0"
+[ -z FFX_THREADS ] && FFX_THREADS="0"
+[ -z FFX_SCALE ] && FFX_SCALE="scale=1280:720"        # scale resolution, no black bars on sides of video on youtube
+[ -z FFX_OUTPUT ] && FFX_OUTPUT=~/screencast.avi
+
+# Note: -vf is optional delete if you want, -y is to overwrite existing file
+# capture fullscreen using alsa or pulseaudio
+ffx-full-hw() { ffmpeg -f alsa -ac $FFX_MONO \
+        -i $FFX_HW -f x11grab -r $FFX_FPS -s $FFX_WIN_FULL -i :0.0 \
+        -acodec $FFX_AUDIO -vcodec $FFX_VIDEO \
+               -preset $FFX_PRESET -crf $FFX_CRF -threads $FFX_THREADS \
+        -vf $FFX_SCALE \
+        -y $FFX_OUTPUT
+}
+ffx-full-pa() { ffmpeg -f alsa -ac $FFX_MONO \
+        -i $FFX_PULSE -f x11grab -r $FFX_FPS -s $FFX_WIN_FULL -i :0.0 \
+        -acodec $FFX_AUDIO -vcodec $FFX_VIDEO \
+               -preset $FFX_PRESET -crf $FFX_CRF -threads $FFX_THREADS \
+        -vf $FFX_SCALE \
+        -y $FFX_OUTPUT
+}
+
+# capture single window, use mouse cursor to select window you want to record
+ffx-winselect-hw() {
+        FFX_INFO=$(xwininfo -frame)
+
+        ffmpeg -f alsa -ac $FFX_MONO \
+        -i $FFX_HW -f x11grab -r $FFX_FPS \
+        -s $(echo $FFX_INFO | grep -oEe 'geometry [0-9]+x[0-9]+'\
+        | grep -oEe '[0-9]+x[0-9]+') \
+        -i :0.0+$(echo $FFX_INFO | grep -oEe 'Corners:\s+\+[0-9]+\+[0-9]+' \
+        | grep -oEe '[0-9]+\+[0-9]+' | sed -e 's/\+/,/' ) \
+        -acodec $FFX_AUDIO -vcodec $FFX_VIDEO \
+               -preset $FFX_PRESET -crf $FFX_CRF -threads $FFX_THREADS \
+        -vf $FFX_SCALE \
+        -y $FFX_OUTPUT
+}
+ffx-winselect-pa() {
+        FFX_INFO=$(xwininfo -frame)
+
+        ffmpeg -f alsa -ac $FFX_MONO \
+        -i $FFX_PULSE -f x11grab -r $FFX_FPS \
+        -s $(echo $FFX_INFO | grep -oEe 'geometry [0-9]+x[0-9]+'\
+        | grep -oEe '[0-9]+x[0-9]+') \
+        -i :0.0+$(echo $FFX_INFO | grep -oEe 'Corners:\s+\+[0-9]+\+[0-9]+' \
+        | grep -oEe '[0-9]+\+[0-9]+' | sed -e 's/\+/,/' ) \
+        -acodec $FFX_AUDIO -vcodec $FFX_VIDEO \
+               -preset $FFX_PRESET -crf $FFX_CRF -threads $FFX_THREADS \
+        -vf $FFX_SCALE \
+        -y $FFX_OUTPUT
+}
+
+advanced(){
+cat <<EOF
+FFX_MONO="1"                # mono
+FFX_DUAL="2"                # dual channel
+FFX_HW="hw:1,0"         # alsa; run 'cat /proc/asound/pcm' to change to the correct numbers
+FFX_PULSE="pulse"         # pulseaudio; might have to install pavucontrol to change volume
+FFX_FPS="30"                # frame per seconds
+FFX_WIN_FULL=$(xrandr | grep '*'|awk {'print $1'})        # record fullscreen
+FFX_AUDIO="pcm_s16le"        # audio codec
+FFX_VIDEO="libx264"        # video codec
+FFX_PRESET="ultrafast"        # preset error? run 'x264 -h' replace with fast,superfast, slow ..etc
+FFX_CRF="0"
+FFX_THREADS="0"
+FFX_SCALE="scale=1280:720"        # scale resolution, no black bars on sides of video on youtube
+FFX_OUTPUT=~/screencast.avi
+EOF
+
+
+}
+help(){
+    echo "This is  a script to record your desktop."
+    echo
+    echo "Output file is located: ~/screencast.avi"
+    echo "usage:"
+    echo "      $(basename $0) [alsa|pulse|windows_alsa|window_pulse]"
+    echo "                     alsa             - will record full screen with alsa sound."
+    echo "                     pulse            - will record full screen useing pulse sound."
+    echo "                     window_alsa      - will let you choose window with using alsa sound."
+    echo "                     window_pulse     - will let you choose window with using pulse sound."
+    echo "                     advanced         - print all advanced envrionment variables"
+    echo "One can override arguments with:"
+    echo "                    FFX_OUTPUT=~/tmp/screenrecord.avi screencapture pulse"
+    echo
+    exit 0
+}
+case $1 in
+    pulse)
+        ffx-full-pa
+    ;;
+    alsa)
+        ffx-full-hw
+    ;;
+    window_alsa)
+        ffx-winselect-hw
+    ;;
+    window_pulse)
+        ffx-winselect-pa
+    ;;
+    help|--help|-h|/?)
+        help
+    ;;
+    advanced)
+        advanced
+    ;;
+    *) 
+        #ffx-full-pa
+        help
+    ;;
+esac
