@@ -1,18 +1,18 @@
 #!/bin/bash
 
-[ -z FFX_MONO ] && FFX_MONO="1"                # mono
-[ -z FFX_DUAL ] && FFX_DUAL="2"                # dual channel
-[ -z FFX_HW ] && FFX_HW="hw:1,0"               # alsa; run 'cat /proc/asound/pcm' to change to the correct numbers
-[ -z FFX_PULSE ] && FFX_PULSE="pulse"          # pulseaudio; might have to install pavucontrol to change volume
-[ -z FFX_FPS ] && FFX_FPS="30"                 # frame per seconds
-[ -z FFX_WIN_FULL ] && FFX_WIN_FULL=$(xrandr | grep '*'|awk {'print $1'})        # record fullscreen
-[ -z FFX_AUDIO ] && FFX_AUDIO="pcm_s16le"      # audio codec
-[ -z FFX_VIDEO ] && FFX_VIDEO="libx264"        # video codec
-[ -z FFX_PRESET ] && FFX_PRESET="ultrafast"    # preset error? run 'x264 -h' replace with fast,superfast, slow ..etc
-[ -z FFX_CRF ] && FFX_CRF="0"
-[ -z FFX_THREADS ] && FFX_THREADS="0"
-[ -z FFX_SCALE ] && FFX_SCALE="scale=1280:720"        # scale resolution, no black bars on sides of video on youtube
-[ -z FFX_OUTPUT ] && FFX_OUTPUT=~/screencast.avi
+[ -z FFX_MONO ] || export FFX_MONO="1"                # mono
+[ -z FFX_DUAL ] || export FFX_DUAL="2"                # dual channel
+[ -z FFX_HW ] || export FFX_HW="hw:1,0"               # alsa; run 'cat /proc/asound/pcm' to change to the correct numbers
+[ -z FFX_PULSE ] || export FFX_PULSE="pulse"          # pulseaudio; might have to install pavucontrol to change volume
+[ -z FFX_FPS ] || export FFX_FPS="30"                 # frame per seconds
+[ -z FFX_WIN_FULL ] || export FFX_WIN_FULL=$(xrandr | grep '*'|awk {'print $1'})        # record fullscreen
+[ -z FFX_AUDIO ] || export FFX_AUDIO="pcm_s16le"      # audio codec
+[ -z FFX_VIDEO ] || export FFX_VIDEO="libx264"        # video codec
+[ -z FFX_PRESET ] || export FFX_PRESET="ultrafast"    # preset error? run 'x264 -h' replace with fast,superfast, slow ..etc
+[ -z FFX_CRF ] || export FFX_CRF="0"
+[ -z FFX_THREADS ] || export FFX_THREADS="0"
+[ -z FFX_SCALE ] || export FFX_SCALE="scale=1280:720"        # scale resolution, no black bars on sides of video on youtube
+[ -z FFX_OUTPUT ] || export FFX_OUTPUT=~/screencast.avi
 
 # Note: -vf is optional delete if you want, -y is to overwrite existing file
 # capture fullscreen using alsa or pulseaudio
@@ -94,7 +94,7 @@ help(){
     echo "One can override arguments with:"
     echo "                    FFX_OUTPUT=~/tmp/screenrecord.avi screencapture pulse"
     echo
-    exit 0
+    #exit 0
 }
 case $1 in
     pulse)
