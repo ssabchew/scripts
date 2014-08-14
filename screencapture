@@ -85,7 +85,7 @@ help(){
     echo
     echo "Output file is located: ~/screencast.avi"
     echo "usage:"
-    echo "      $(basename $0) [alsa|pulse|windows_alsa|window_pulse]"
+    echo "      $(basename $0) [alsa|pulse|window_alsa|window_pulse]"
     echo "                     alsa             - will record full screen with alsa sound."
     echo "                     pulse            - will record full screen useing pulse sound."
     echo "                     window_alsa      - will let you choose window with using alsa sound."
