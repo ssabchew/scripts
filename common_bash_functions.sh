@@ -281,3 +281,22 @@ m=$(date '+%m')
 d=$(date '+%d')
 
 }
+
+
+function showcolors (){
+    local t='gYw';
+    local fgs;
+    local bg;
+    echo -e "\n                 40m     41m     42m     43m     44m     45m     46m     47m";
+    for fgs in '    m' '   1m' '  30m' '1;30m' '  31m' '1;31m' '  32m' '1;32m' '  33m' '1;33m' '  34m' '1;34m' '  35m' '1;35m' '  36m' '1;36m' '  37m' '1;37m';
+    do
+        fg=${fgs// /};
+        echo -en " $fgs \e[$fg  $t  ";
+        for bg in 40m 41m 42m 43m 44m 45m 46m 47m;
+        do
+            echo -en "$EINS \e[$fg\e[$bg  $t  \e[0m";
+        done;
+        echo;
+    done;
+    echo
+}
