@@ -1,7 +1,7 @@
 #!/bin/bash
 ## About:       Non executable. Collecton of bash functions.
-## OS   :       RHEL/CentOS 6.x
-## LastChange:  2014-01-21
+## OS   :       RHEL/CentOS / Fedora
+## Version:  2015-11-17
 
 #=== User Mgmt functions
 
@@ -202,6 +202,15 @@ fi
 
 }
 
+function notify_desktop_simple(){
+##
+##
+## Usage: notify_desktop message
+
+notify-send -t 0 -i ~/bin/ibus-setup "$*"
+
+}
+
 function die(){
 ## function die
 ## Print all arguments and exits with code 1
@@ -281,7 +290,6 @@ m=$(date '+%m')
 d=$(date '+%d')
 
 }
-
 
 function showcolors (){
     local t='gYw';
